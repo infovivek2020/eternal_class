@@ -1,0 +1,46 @@
+<!--Header Part Start-->
+<header>
+<div class="container-fluid">
+ <div class="container font1 hgh-40">
+  <div class="row">
+    <div class="col-sm-4 d-none d-sm-block">
+      <p class="m-t-9">+91 123 456 7890</p>
+      </div>
+    <div class="col-sm-8 d-none d-sm-block">
+        <div class="float-right header-part">
+          <ul>
+            <li>info@ksgrandsprojects.com</li>
+            <li>Login</li>
+            <li>Register</li>
+         </ul>
+        </div>
+    </div>
+
+      
+  </div>
+  
+ </div>    
+</div>
+<div class="container-fluid bg-header font1">
+<div class="container">
+           <nav class="navbar navbar-expand-md hgh-62">
+        <div class="logo-size">
+     <a href="index2.html"><img src="images/newlogo2.png" class="img-fluid">   </a>  </div>
+     <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#menu-collapse">
+     <span class="navbar-toggler-icon bg-wh"></span>    
+    </button>
+    <div class="collapse navbar-collapse" id="menu-collapse">
+     <ul class="navbar-nav ml-auto menu-set">
+         <li class="nav-item"><a href="#" class="nav-link">HOME</a></li>
+         <li class="nav-item"><a href="#" class="nav-link">ABOUT US</a></li>
+         <li class="nav-item"><a href="#" class="nav-link">PROPERTIES</a></li>
+         <li class="nav-item"><a href="#" class="nav-link">AGENTS</a></li>
+         <li class="nav-item"><a href="#" class="nav-link">GALLERY</a></li>
+         <li class="nav-item"><a href="#" class="nav-link">CONTACT US</a></li>
+        </ul>    
+    </div>
+    </nav>
+    </div>
+    </div>
+</header>
+<!--Header Part End-->
