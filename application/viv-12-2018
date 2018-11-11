@@ -1,0 +1,295 @@
+public function actiontest()
+	{
+$response = array();
+		$errorMessage = array();
+		$error = 0;
+		$objectdata = json_decode($_POST['testval']);
+		//print_r($objectdata->fullName);die;
+		$fullname = $objectdata->fullName;
+		$terms = $objectdata->terms;
+		$gender = $objectdata->gender;
+		$website = $objectdata->website;
+		$postcode = $objectdata->postcode;
+		$pw = $objectdata->pw;
+		$email = $objectdata->email;
+		$mobile = $objectdata->mobileno;
+		$aadhar = $objectdata->aadhar;
+		$search = $objectdata->search;
+		$pancard = $objectdata->pancard;
+		/*
+		$fullname = $_POST['testval']['fullname'];
+		$terms = $_POST['testval']['terms'];
+		$gender = $_POST['testval']['gender'];
+		$website = $_POST['testval']['website'];
+		$postcode = $_POST['testval']['postcode'];
+		$pw = $_POST['testval']['pw'];
+		$email = $_POST['testval']['email'];
+		$mobile = $_POST['testval']['mobileno'];
+		$aadhar = $_POST['testval']['aadhar'];
+		$search = $_POST['testval']['search'];
+		$pancard = $_POST['testval']['pancard'];*/
+		if(empty($fullname)){
+			$error = 1;
+			$errorMessage['error_name'] = 'Name is required.';
+		}
+		$namePattern = "/^[a-zA-Z ]$/";
+		if(!empty($fullname)){
+			if(preg_match($namePattern, $fullname)==0){
+			$error = 1;
+			$errorMessage['error_name'] = 'Name is invalid.';
+			}			
+		}
+
+		if(empty($terms)){
+			$error = 1;
+			$errorMessage['error_terms'] = 'Terms is required.';
+		}
+		
+
+		if(empty($gender)){
+			$error = 1;
+			$errorMessage['error_gender'] = 'Gender is required.';
+		}
+		if(empty($website)){
+			$error = 1;
+			$errorMessage['error_website'] = 'Website is required.';
+		}
+		$websitePattern = '/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i';
+		if(!empty($website) && preg_match($websitePattern, $website)==0){
+			$error = 1;
+			$errorMessage['error_website'] = 'Website is invalid.';
+		}
+		if(empty($postcode)){
+			$error = 1;
+			$errorMessage['error_postcode'] = 'Postcode is required.';
+		}
+		$postcodePattern='/^[1-9]{1}[0-9]{5}$/';
+		if(!empty($postcode) && preg_match($postcodePattern, $fullname)==0){
+			$error = 1;
+			$errorMessage['error_postcode'] = 'Postcode is invalid.';
+		}
+		if(empty($pw)){
+			$error = 1;
+			$errorMessage['error_pw'] = 'Password is required.';
+		}
+		$pwPattern='/^[A-Za-z0-9]{8,20}$/';
+		if(!empty($fullname) && preg_match($pwPattern, $pw)==0){
+			$error = 1;
+			$errorMessage['error_password'] = 'Password is invalid.';
+		}
+		if(empty($email)){
+			$error = 1;
+			$errorMessage['error_email'] = 'Email is required.';
+		}
+		$emailPattern='/^[a-zA-Z0-9][a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/';
+		if(!empty($email) && preg_match($emailPattern, $fullname)==0){
+			$error = 1;
+			$errorMessage['error_email'] = 'Email is invalid.';
+		}
+		if(empty($aadhar)){
+			$error = 1;
+			$errorMessage['error_aadhar'] = 'Aadhar is required.';
+		}
+		$aadharPattern='/^[1-9]{1}[0-9]{11}$/';
+		if(!empty($aadhar) && preg_match($aadharPattern, $aadhar)==0){
+			$error = 1;
+			$errorMessage['error_aadhar'] = 'Aadhar is invalid.';
+		}
+		
+		$searchPattern='/^[a-zA-Z ]$/';
+		if(!empty($search) && preg_match($searchPattern, $search)==0){
+			$error = 1;
+			$errorMessage['error_search'] = 'Search is invalid.';
+		}
+		if(empty($pancard)){
+			$error = 1;
+			$errorMessage['error_pancard'] = 'Pancard is required.';
+		}
+		$pancardPattern='/^[a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}$/';
+		if(!empty($pancard) && preg_match($pancardPattern, $pancard)==0){
+			$error = 1;
+			$errorMessage['error_pancard'] = 'Pancard is invalid.';
+		}
+		
+          if($error==1){
+          	 			$response[CODE]=VALIDATION_CODE;
+                        $response[MESSAGE]='Validation error';
+                        $response[DESCRIPTION]='error in validation';
+                        $response['all_error'] = $errorMessage;
+          }else{
+          	$insertdata = array('name'=>$fullname, 'email'=>$email, 'mobile'=>$mobile, 'aadhar'=>$aadhar, 'pw'=>$pw, 'terms'=>$terms, 'pancard'=>$pancard, 'gender'=>$gender, 'website'=>$website, 'postcode'=>$postcode, 'search'=>$search, 'created_at'=>time('Y-m-d h:i:s'));
+          	$tablename = 'vec_test_tbl';
+          	$resultdata = $this->crud->commonInsert($tablename,$insertdata);
+          	if($resultdata->code==SUCCESS_CODE){
+          				$response[CODE]=SUCCESS_CODE;
+                        $response[MESSAGE]='Success';
+                        $response[DESCRIPTION]='SUccessfully inserted.';
+          	}else{	
+          				$response[CODE]=FAIL_CODE;
+                        $response[MESSAGE]='fail';
+                        $response[DESCRIPTION]='Fail to  insert.';
+          	}
+          }
+          echo json_encode($response);die;
+	}
+  
+  /////////////////////view page for ajax//////////////////////////
+   <script type="text/javascript">
+       $('#frmtest').on('submit',function(e){
+      e.preventDefault();
+      var $form = $("#frmtest");
+      var newarray = getFormData($form);
+      //console.log(newarray);
+      if(Object.keys(newarray).length>0){      
+        $.ajax({
+           dataType:"JSON",
+                type:"POST",
+                data: {'testval':newarray},
+                url:"<?php echo base_url('frontend/frontend_controller/actiontest'); ?>",
+               // contentType:false,
+              //  cache:false,
+               // processData:false,
+          success:function(d) {
+            console.log(d);
+            if(d.code==200){
+              $("#displayMsg").html(d.description);              
+              setTimeout(function(){window.location="<?php echo base_url(); ?>frontend/frontend_controller/actiontest";},1000); 
+            }else{
+              console.log(d.description);
+              //alert(d.description);
+              $("#displayMsg").html('Failed to create webinar');
+            }
+          },
+          error:function(er) {
+            console.log(er);
+          }
+        });
+      }
+        
+    });
+
+       function getFormData($form){
+    var unindexed_array = $form.serializeArray();
+    var indexed_array = {};
+
+    $.map(unindexed_array, function(n, i){
+        indexed_array[n['name']] = n['value'];
+    });
+
+    return JSON.stringify(indexed_array);
+}
+    </script>
+    
+    ///////////////////////////////////////html page part form/////////////////////////////////////
+    
+        <form class="well form-horizontal" name="frmtest" id="frmtest" action="" method="post" enctype="multipart/form-data">
+                      <fieldset>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">Gender</label>
+                            <div class="col-md-8 inputGroupContainer">
+                               <div class="input-group">
+                              <input type="radio" name="gender" value="1" checked required/> Male<br/>
+                                <input type="radio" name="gender" value="2"/> Female<br/>
+                                <input type="radio" name="gender" value="3"/> Other<br/>
+                               </div><p id="errorname">hellogh fh fgh fgh</p>
+                            </div>
+                         </div>
+                         <div class="form-group">
+                            <label class="col-md-4 control-label">Aggred</label>
+                            <div class="col-md-8 inputGroupContainer">
+                               <div class="input-group">
+                              <input type="checkbox" name="terms" required value="1">
+                               </div><p id="errorname">hellogh fh fgh fgh</p>
+                            </div>
+                         </div>
+                         <div class="form-group">
+                            <label class="col-md-4 control-label">Full Name</label>
+                            <div class="col-md-8 inputGroupContainer">
+                               <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="fullName" name="fullName" placeholder="Enter name" class="form-control" required value="" type="text" pattern="[a-zA-Z ]+" maxlength="50" title="Enter valid name" autocomplete="false">
+
+                               </div><p id="errorname">hellogh fh fgh fgh</p>
+                            </div>
+                         </div>
+                         <div class="form-group">
+                            <label class="col-md-4 control-label">URL</label>
+                            <div class="col-md-8 inputGroupContainer">
+                               <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
+                                <input type="url" name="website" class="form-control" required="true" pattern="https?://.+" title="Include http://" placeholder="Enter URL."></div><p id="errorurl">hellogh fh fgh fgh</p>
+                            </div>
+                         </div>
+                         <div class="form-group">
+                            <label class="col-md-4 control-label">Pan Card</label>
+                            <div class="col-md-8 inputGroupContainer">
+                               <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="pancard" name="pancard" placeholder="Enter Pancard no" class="form-control" required="true" value="" type="text" autocomplete="false" pattern="([a-zA-Z]{5})(\d{4})([a-zA-Z]{1})" title="Enter valid pancard no."></div>
+                               <p id="errorpancard">hellogh fh fgh fgh</p>
+                            </div>
+                         </div>
+                         <div class="form-group">
+                            <label class="col-md-4 control-label">Search field</label>
+                            <div class="col-md-8 inputGroupContainer">
+                               <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input type="search" name="search" pattern="[^'\x22]+" title="Invalid input"></div>
+                               <p id="errorsearch">hellogh fh fgh fgh</p>
+                            </div>
+                         </div>
+                         <div class="form-group">
+                            <label class="col-md-4 control-label">Aadhar</label>
+                            <div class="col-md-8 inputGroupContainer">
+                               <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="aadhar" name="aadhar" placeholder="Enter Aadhar no" class="form-control" required="true" value="" type="text" pattern="[1-9]{1}[0-9]{11}" title="Enter valid aadhar no."  autocomplete="false" maxlength="12"></div>
+                               <p id="erroraadhar">hellogh fh fgh fgh</p>
+                            </div>
+                         </div>
+                         <div class="form-group">
+                            <label class="col-md-4 control-label">Postal Code/ZIP</label>
+                            <div class="col-md-8 inputGroupContainer">
+                               <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="postcode" name="postcode" placeholder="Postal Code/ZIP" class="form-control" required="true" value="" type="text"  pattern="[1-9]{1}[0-9]{5}" title="Enter valid zip." autocomplete="false" maxlength="6"></div>
+                               <p id="errorpostcode">hellogh fh fgh fgh</p>
+                            </div>
+                         </div>
+                         <div class="form-group">
+                            <label class="col-md-4 control-label">Password</label>
+                            <div class="col-md-8 inputGroupContainer">
+                               <div class="input-group">
+                                  <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
+                                  <input type="password" name="pw" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters" placeholder="Enter Password.">
+                               </div>
+                               <p id="errorpassword">hellogh fh fgh fgh</p>
+                            </div>
+                         </div>
+                         <div class="form-group">
+                            <label class="col-md-4 control-label">Email</label>
+                            <div class="col-md-8 inputGroupContainer">
+                               <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span><input id="email" name="email" placeholder="Enter email" class="form-control" required="true" value="" type="email" required="true" autocomplete="false" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Enter valid email." ></div><p id="errorpassword">hellogh fh fgh fgh</p>
+                            </div>
+                            
+                         </div>
+                         <div class="form-group">
+                            <label class="col-md-4 control-label">Mobile No.</label>
+                            <div class="col-md-8 inputGroupContainer">
+                               <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span><input id="mobileno" name="mobileno" placeholder="Enter mobile no" class="form-control" required="true" value="" type="text" pattern="[6-9]{1}[0-9]{9}" title="Enter valid mobile no." autocomplete="false" maxlength="10"></div><p id="errormobileno">hellogh fh fgh fgh</p>
+                            </div>
+                         </div>
+                         <div class="form-group">
+                            <label class="col-md-4 control-label">Photo</label>
+                            <div class="col-md-8 inputGroupContainer">
+                               <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span><input id="photo" name="photo" placeholder="Enter photo" class="form-control" required="true" accept="image/*" type="file"></div>
+                               <p id="errorphoto">hellogh fh fgh fgh</p>
+                            </div>
+                         </div>
+                         <div class="form-group">
+                            <label class="col-md-4 control-label">Photo Proof</label>
+                            <div class="col-md-8 inputGroupContainer">
+                               <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span><input id="proof" name="proof" placeholder="Enter proof" class="form-control" required="true" accept="image/*" type="file" multiple></div>
+                               <p id="errorproof">hellogh fh fgh fgh</p>
+                            </div>
+                         </div>
+
+                          <div class="form-group">
+                           <!--  <label class="col-md-4 control-label">Mobile No.</label> -->
+                            <div class="col-md-4">
+                               <div class="input-group">
+                               <input type="submit" name="submit" id="submit" value="Submit"></div>
+                            </div>
+                         </div>
+                      </fieldset>
+                   </form>
+  
