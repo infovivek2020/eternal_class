@@ -1,6 +1,6 @@
 public function actiontest()
 	{
-$response = array();
+		$response = array();
 		$errorMessage = array();
 		$error = 0;
 		$objectdata = json_decode($_POST['testval']);
@@ -32,12 +32,10 @@ $response = array();
 			$error = 1;
 			$errorMessage['error_name'] = 'Name is required.';
 		}
-		$namePattern = "/^[a-zA-Z ]$/";
-		if(!empty($fullname)){
-			if(preg_match($namePattern, $fullname)==0){
+		$namePattern = '/^[a-zA-Z ]*$/';
+		if(!empty($fullname) && preg_match($namePattern, $fullname)==0){
 			$error = 1;
 			$errorMessage['error_name'] = 'Name is invalid.';
-			}			
 		}
 
 		if(empty($terms)){
@@ -63,8 +61,8 @@ $response = array();
 			$error = 1;
 			$errorMessage['error_postcode'] = 'Postcode is required.';
 		}
-		$postcodePattern='/^[1-9]{1}[0-9]{5}$/';
-		if(!empty($postcode) && preg_match($postcodePattern, $fullname)==0){
+		$postcodePattern='/^[0-9]{6}$/';
+		if(!empty($postcode) && preg_match($postcodePattern, $postcode)==0){
 			$error = 1;
 			$errorMessage['error_postcode'] = 'Postcode is invalid.';
 		}
@@ -82,7 +80,7 @@ $response = array();
 			$errorMessage['error_email'] = 'Email is required.';
 		}
 		$emailPattern='/^[a-zA-Z0-9][a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/';
-		if(!empty($email) && preg_match($emailPattern, $fullname)==0){
+		if(!empty($email) && preg_match($emailPattern, $email)==0){
 			$error = 1;
 			$errorMessage['error_email'] = 'Email is invalid.';
 		}
@@ -96,7 +94,7 @@ $response = array();
 			$errorMessage['error_aadhar'] = 'Aadhar is invalid.';
 		}
 		
-		$searchPattern='/^[a-zA-Z ]$/';
+		$searchPattern='/^[a-zA-Z ]*$/';
 		if(!empty($search) && preg_match($searchPattern, $search)==0){
 			$error = 1;
 			$errorMessage['error_search'] = 'Search is invalid.';
@@ -117,9 +115,9 @@ $response = array();
                         $response[DESCRIPTION]='error in validation';
                         $response['all_error'] = $errorMessage;
           }else{
-          	$insertdata = array('name'=>$fullname, 'email'=>$email, 'mobile'=>$mobile, 'aadhar'=>$aadhar, 'pw'=>$pw, 'terms'=>$terms, 'pancard'=>$pancard, 'gender'=>$gender, 'website'=>$website, 'postcode'=>$postcode, 'search'=>$search, 'created_at'=>time('Y-m-d h:i:s'));
+          	$insertdata = array('name'=>$fullname, 'email'=>$email, 'mobile'=>$mobile, 'aadhar'=>$aadhar, 'pw'=>$pw, 'terms'=>$terms, 'pancard'=>$pancard, 'gender'=>$gender, 'website'=>$website, 'postcode'=>$postcode, 'search'=>$search, 'created_at'=>date('Y-m-d h:i:s'));
           	$tablename = 'vec_test_tbl';
-          	$resultdata = $this->crud->commonInsert($tablename,$insertdata);
+          	$resultdata = json_decode($this->crud->commonInsert($tablename,$insertdata));
           	if($resultdata->code==SUCCESS_CODE){
           				$response[CODE]=SUCCESS_CODE;
                         $response[MESSAGE]='Success';
@@ -134,7 +132,7 @@ $response = array();
 	}
   
   /////////////////////view page for ajax//////////////////////////
-   <script type="text/javascript">
+       <script type="text/javascript">
        $('#frmtest').on('submit',function(e){
       e.preventDefault();
       var $form = $("#frmtest");
@@ -153,11 +151,40 @@ $response = array();
             console.log(d);
             if(d.code==200){
               $("#displayMsg").html(d.description);              
-              setTimeout(function(){window.location="<?php echo base_url(); ?>frontend/frontend_controller/actiontest";},1000); 
-            }else{
-              console.log(d.description);
+              setTimeout(function(){window.location="<?php echo base_url(); ?>test";},1000); 
+            }else if(d.code==301){
+              var newerr = d.all_error;
+              console.log(newerr);
               //alert(d.description);
-              $("#displayMsg").html('Failed to create webinar');
+              if(newerr.error_name){
+                 $("#errorname").html(newerr.error_name);
+              }
+              if(newerr.error_email){
+                 $("#erroremail").html(newerr.error_email);
+              }             
+              if(newerr.error_mobile){
+                 $("#errormobileno").html(newerr.error_mobile);
+              }
+              if(newerr.error_pancard){
+                 $("#errorpancard").html(newerr.error_pancard);
+              }
+              if(newerr.error_search){
+                 $("#errorsearch").html(newerr.error_search);
+              }
+              if(newerr.error_postcode){
+                 $("#errorpostcode").html(newerr.error_postcode);
+              }
+              if(newerr.error_aadhar){
+                 $("#erroraadhar").html(newerr.error_aadhar);
+              }
+               if(newerr.error_password){
+                 $("#errorpassword").html(newerr.error_password);
+              }
+               if(newerr.error_website){
+                 $("#errorurl").html(newerr.error_website);
+              }            
+             
+
             }
           },
           error:function(er) {
@@ -178,11 +205,10 @@ $response = array();
 
     return JSON.stringify(indexed_array);
 }
-    </script>
-    
+    </script>    
     ///////////////////////////////////////html page part form/////////////////////////////////////
     
-        <form class="well form-horizontal" name="frmtest" id="frmtest" action="" method="post" enctype="multipart/form-data">
+    <form class="well form-horizontal" name="frmtest" id="frmtest" action="" method="post" enctype="multipart/form-data">
                       <fieldset>
                         <div class="form-group">
                             <label class="col-md-4 control-label">Gender</label>
@@ -191,7 +217,7 @@ $response = array();
                               <input type="radio" name="gender" value="1" checked required/> Male<br/>
                                 <input type="radio" name="gender" value="2"/> Female<br/>
                                 <input type="radio" name="gender" value="3"/> Other<br/>
-                               </div><p id="errorname">hellogh fh fgh fgh</p>
+                               </div><p id=""></p>
                             </div>
                          </div>
                          <div class="form-group">
@@ -199,7 +225,7 @@ $response = array();
                             <div class="col-md-8 inputGroupContainer">
                                <div class="input-group">
                               <input type="checkbox" name="terms" required value="1">
-                               </div><p id="errorname">hellogh fh fgh fgh</p>
+                               </div><p id=""></p>
                             </div>
                          </div>
                          <div class="form-group">
@@ -207,42 +233,43 @@ $response = array();
                             <div class="col-md-8 inputGroupContainer">
                                <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="fullName" name="fullName" placeholder="Enter name" class="form-control" required value="" type="text" pattern="[a-zA-Z ]+" maxlength="50" title="Enter valid name" autocomplete="false">
 
-                               </div><p id="errorname">hellogh fh fgh fgh</p>
+                               </div><p id="errorname"></p>
                             </div>
                          </div>
                          <div class="form-group">
                             <label class="col-md-4 control-label">URL</label>
                             <div class="col-md-8 inputGroupContainer">
                                <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span>
-                                <input type="url" name="website" class="form-control" required="true" pattern="https?://.+" title="Include http://" placeholder="Enter URL."></div><p id="errorurl">hellogh fh fgh fgh</p>
+                                <input type="url" name="website" class="form-control" required="true" pattern="https?://.+" title="Include http://" placeholder="Enter URL."></div>
+                                <p id="errorurl"></p>
                             </div>
                          </div>
                          <div class="form-group">
                             <label class="col-md-4 control-label">Pan Card</label>
                             <div class="col-md-8 inputGroupContainer">
                                <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="pancard" name="pancard" placeholder="Enter Pancard no" class="form-control" required="true" value="" type="text" autocomplete="false" pattern="([a-zA-Z]{5})(\d{4})([a-zA-Z]{1})" title="Enter valid pancard no."></div>
-                               <p id="errorpancard">hellogh fh fgh fgh</p>
+                               <p id="errorpancard"></p>
                             </div>
                          </div>
                          <div class="form-group">
                             <label class="col-md-4 control-label">Search field</label>
                             <div class="col-md-8 inputGroupContainer">
                                <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input type="search" name="search" pattern="[^'\x22]+" title="Invalid input"></div>
-                               <p id="errorsearch">hellogh fh fgh fgh</p>
+                               <p id="errorsearch"></p>
                             </div>
                          </div>
                          <div class="form-group">
                             <label class="col-md-4 control-label">Aadhar</label>
                             <div class="col-md-8 inputGroupContainer">
                                <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="aadhar" name="aadhar" placeholder="Enter Aadhar no" class="form-control" required="true" value="" type="text" pattern="[1-9]{1}[0-9]{11}" title="Enter valid aadhar no."  autocomplete="false" maxlength="12"></div>
-                               <p id="erroraadhar">hellogh fh fgh fgh</p>
+                               <p id="erroraadhar"></p>
                             </div>
                          </div>
                          <div class="form-group">
                             <label class="col-md-4 control-label">Postal Code/ZIP</label>
                             <div class="col-md-8 inputGroupContainer">
                                <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="postcode" name="postcode" placeholder="Postal Code/ZIP" class="form-control" required="true" value="" type="text"  pattern="[1-9]{1}[0-9]{5}" title="Enter valid zip." autocomplete="false" maxlength="6"></div>
-                               <p id="errorpostcode">hellogh fh fgh fgh</p>
+                               <p id="errorpostcode"></p>
                             </div>
                          </div>
                          <div class="form-group">
@@ -258,14 +285,14 @@ $response = array();
                          <div class="form-group">
                             <label class="col-md-4 control-label">Email</label>
                             <div class="col-md-8 inputGroupContainer">
-                               <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span><input id="email" name="email" placeholder="Enter email" class="form-control" required="true" value="" type="email" required="true" autocomplete="false" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Enter valid email." ></div><p id="errorpassword">hellogh fh fgh fgh</p>
+                               <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span><input id="email" name="email" placeholder="Enter email" class="form-control" required="true" value="" type="email" required="true" autocomplete="false" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Enter valid email." ></div><p id="erroremail"></p>
                             </div>
                             
                          </div>
                          <div class="form-group">
                             <label class="col-md-4 control-label">Mobile No.</label>
                             <div class="col-md-8 inputGroupContainer">
-                               <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span><input id="mobileno" name="mobileno" placeholder="Enter mobile no" class="form-control" required="true" value="" type="text" pattern="[6-9]{1}[0-9]{9}" title="Enter valid mobile no." autocomplete="false" maxlength="10"></div><p id="errormobileno">hellogh fh fgh fgh</p>
+                               <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span><input id="mobileno" name="mobileno" placeholder="Enter mobile no" class="form-control" required="true" value="" type="text" pattern="[6-9]{1}[0-9]{9}" title="Enter valid mobile no." autocomplete="false" maxlength="10"></div><p id="errormobileno"></p>
                             </div>
                          </div>
                          <div class="form-group">
@@ -292,4 +319,3 @@ $response = array();
                          </div>
                       </fieldset>
                    </form>
-  
