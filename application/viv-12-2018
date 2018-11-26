@@ -319,3 +319,34 @@ public function actiontest()
                          </div>
                       </fieldset>
                    </form>
+=============golang practice==================
+
+palindrome
+armstrong
+leap year
+interest
+pattern
+swap
+sum,div,substract,multiply
+gcd
+odd even
+string manupulation
+prime 
+factor
+largest no from collection
+sorting
+root of quadratic
+sum of natural no
+fibonacci
+reverse a number
+calculate a power of a number
+multiply table
+simple calculatore using switch case
+binary to decimal and vice versa
+reverse sentence
+swap a no by cyclic order
+frequency of char in string
+remove all char from string except alpha
+length of sting
+sort element in lexicographical
+
